@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: ecommerce_postgres
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  ingestion:
+    build: ./ingestion
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+
+  transform:
+    build: ./transform
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
